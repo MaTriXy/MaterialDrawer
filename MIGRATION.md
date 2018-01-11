@@ -1,4 +1,36 @@
-###Upgrade Notes
+### Upgrade Notes
+
+#### v6.0.0
+**IMPORTANT IF YOU USE THE FASTADAPTER OR ABOUTLIBRARIES**
+* You have to update your FastAdapter dependency to v3.0.0 with this release
+* See the MIGRATION information of the FastAdapter https://github.com/mikepenz/FastAdapter/blob/develop/MIGRATION.md
+
+#### v5.9.0 & v5.9.2
+**IMPORTANT IF YOU USE THE FASTADAPTER OR ABOUTLIBRARIES**
+* You have to update your FastAdapter dependency to v2.5.0 with this release
+* See the MIGRATION information of the FastAdapter https://github.com/mikepenz/FastAdapter/blob/develop/MIGRATION.md
+
+#### v5.8.0
+**IMPORTANT IF YOU USE THE FASTADAPTER OR ABOUTLIBRARIES**
+* You have to update your FastAdapter dependency to v2.1.0 with this release
+* See the MIGRATION information of the FastAdapter https://github.com/mikepenz/FastAdapter/blob/develop/MIGRATION.md
+
+#### v5.7.0
+**IMPORTANT IF YOU IMPLEMENT CUSTOM-DRAWER-ITEMS OR USE THE FASTADAPTER**
+* You have to update your `FastAdapter` dependency to v2.0.0 with this release
+* If you have `CustomDrawerItem`'s not based on the `AbstractDrawerITems` make sure you implement the `unbindView` method, and the new required methods
+* See the MIGRATION information of the **FastAdapter** https://github.com/mikepenz/FastAdapter/blob/develop/MIGRATION.md
+
+#### v5.6.0
+**IMPORTANT IF YOU IMPLEMENT CUSTOM-DRAWER-ITEMS OR USE THE FASTADAPTER**
+* This release brings a breaking interface change. Your items now have to implement `bindView(ViewHolder holder, List payloads)` instead of `bindView(VH holder)`. 
+ * The additional payload can be used to implement a more performant view updating when only parts of the item have changed. Please also refer to the `DiffUtils` which may provide the payload.
+
+#### v5.5.1
+* add `void set(ImageView imageView, Uri uri, Drawable placeholder, String tag);` to `IDrawerImageLoader` interface, similar to the `tag` provided in the placeholder method
+
+#### v5.5.0
+* **Dropping support for API < 14. New MinSdkVersion is 14**
 
 #### v5.3.3 -> 5.3.4
 * If you use the `FastAdapter` please read the upgrade notes for v1.6.0 (https://github.com/mikepenz/FastAdapter/releases/tag/v1.6.0)
@@ -58,7 +90,7 @@
 
 #### < v4.0.0
 
-#####Common changes
+##### Common changes
 * depends on the latest `v23` **support libraries**. Those also require you to have `compileSDKVersion 23`
 * change the `onItemClick` listener to `onItemClick(View view, int i, IDrawerItem iDrawerItem)`
 * modify the import of the `AccountHeader` and `AccountHeaderBuilder` to
@@ -74,7 +106,7 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder
 * change `updateName`, `updateIcon`, `updateBadge` those methods take now an `identifier` and the specific `Holder` object
 * all `get*` methods of the `DrawerItems` will now return a `Holder` object for the specific type, making it easier to work with types like `String`, `StringRes`, `Color`, `ColorRes`, `ColorInt`, ..
 
-#####Android-Iconics (icon font)
+##### Android-Iconics (icon font)
 * the MaterialDrawer now only includes the `core` of the Android-Iconics project
  * add the fonts you use https://github.com/mikepenz/Android-Iconics#2-choose-your-desired-fonts
 * pre MaterialDrawer v4.0.0 following fonts were included
@@ -83,7 +115,7 @@ compile 'com.mikepenz:google-material-typeface:1.2.0.1@aar' //Google Material De
 compile 'com.mikepenz:fontawesome-typeface:4.4.0.1@aar' //FontAwesome **NOTE:** the packagename changed for this font
 ```
 
-#####Advanced usage changes
+##### Advanced usage changes
 * changed the `ListView` to a `RecyclerView`
  * rename methods with `*ListView*` to `*RecyclerView*`
 * the `IDrawerItem` interface was extended to better reflect a `RecyclerView` and to improve performance

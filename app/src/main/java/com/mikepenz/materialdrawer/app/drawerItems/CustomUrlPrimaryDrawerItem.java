@@ -6,11 +6,12 @@ import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.materialdrawer.app.R;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.interfaces.ColorfulBadgeable;
+
+import java.util.List;
 
 /**
  * Created by mikepenz on 03.02.15.
@@ -63,7 +64,9 @@ public class CustomUrlPrimaryDrawerItem extends CustomUrlBasePrimaryDrawerItem<C
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         Context ctx = viewHolder.itemView.getContext();
 
         //bind the basic view parts
@@ -89,14 +92,8 @@ public class CustomUrlPrimaryDrawerItem extends CustomUrlBasePrimaryDrawerItem<C
     }
 
     @Override
-    public ViewHolderFactory getFactory() {
-        return new ItemFactory();
-    }
-
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     public static class ViewHolder extends CustomBaseViewHolder {

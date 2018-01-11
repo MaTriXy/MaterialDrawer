@@ -5,16 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
+import android.support.annotation.*;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.R;
 import com.mikepenz.materialdrawer.holder.ColorHolder;
@@ -26,6 +22,8 @@ import com.mikepenz.materialdrawer.model.interfaces.Typefaceable;
 import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 import com.mikepenz.materialize.util.UIUtils;
 
+import java.util.List;
+
 /**
  * Created by mikepenz on 03.02.15.
  */
@@ -33,13 +31,14 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
     private ImageHolder icon;
 
     private StringHolder name;
-    private StringHolder email;
+    private StringHolder description;
 
     private boolean iconTinted = false;
 
     private ColorHolder selectedColor;
     private ColorHolder textColor;
     private ColorHolder iconColor;
+    private ColorHolder descriptionTextColor;
 
     private Typeface typeface = null;
 
@@ -86,14 +85,24 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
         return this;
     }
 
+    public ProfileSettingDrawerItem withName(@StringRes int nameRes) {
+        this.name = new StringHolder(nameRes);
+        return this;
+    }
+
     public ProfileSettingDrawerItem withDescription(String description) {
-        this.email = new StringHolder(description);
+        this.description = new StringHolder(description);
+        return this;
+    }
+
+    public ProfileSettingDrawerItem withDescription(@StringRes int descriptionRes) {
+        this.description = new StringHolder(descriptionRes);
         return this;
     }
 
     //NOTE we reuse the IProfile here to allow custom items within the AccountSwitcher. There is an alias method withDescription for this
     public ProfileSettingDrawerItem withEmail(String email) {
-        this.email = new StringHolder(email);
+        this.description = new StringHolder(email);
         return this;
     }
 
@@ -114,6 +123,16 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
 
     public ProfileSettingDrawerItem withTextColorRes(@ColorRes int textColorRes) {
         this.textColor = ColorHolder.fromColorRes(textColorRes);
+        return this;
+    }
+
+    public ProfileSettingDrawerItem withDescriptionTextColor(@ColorInt int descriptionColor) {
+        this.descriptionTextColor = ColorHolder.fromColor(descriptionColor);
+        return this;
+    }
+
+    public ProfileSettingDrawerItem withDescriptionTextColorRes(@ColorRes int descriptionColorRes) {
+        this.descriptionTextColor = ColorHolder.fromColorRes(descriptionColorRes);
         return this;
     }
 
@@ -145,6 +164,10 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
         return textColor;
     }
 
+    public ColorHolder getDescriptionTextColor() {
+        return descriptionTextColor;
+    }
+
     public ColorHolder getIconColor() {
         return iconColor;
     }
@@ -173,15 +196,15 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
     }
 
     public StringHolder getEmail() {
-        return email;
+        return description;
     }
 
     public StringHolder getDescription() {
-        return email;
+        return description;
     }
 
     public void setDescription(String description) {
-        this.email = new StringHolder(description);
+        this.description = new StringHolder(description);
     }
 
     @Override
@@ -206,7 +229,9 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         //get the context
         Context ctx = viewHolder.itemView.getContext();
 
@@ -224,11 +249,15 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
         //get the correct color for the text
         int color = ColorHolder.color(getTextColor(), ctx, R.attr.material_drawer_primary_text, R.color.material_drawer_primary_text);
         int iconColor = ColorHolder.color(getIconColor(), ctx, R.attr.material_drawer_primary_icon, R.color.material_drawer_primary_icon);
+        int descriptionColor = ColorHolder.color(getDescriptionTextColor(), ctx, R.attr.material_drawer_primary_text, R.color.material_drawer_primary_text);
 
-        UIUtils.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, true));
+        UIUtils.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, isSelectedBackgroundAnimated()));
 
         StringHolder.applyTo(this.getName(), viewHolder.name);
         viewHolder.name.setTextColor(color);
+
+        StringHolder.applyToOrHide(this.getDescription(), viewHolder.description);
+        viewHolder.description.setTextColor(descriptionColor);
 
         if (getTypeface() != null) {
             viewHolder.name.setTypeface(getTypeface());
@@ -245,26 +274,22 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
     }
 
     @Override
-    public ViewHolderFactory<ViewHolder> getFactory() {
-        return new ItemFactory();
-    }
-
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private View view;
         private ImageView icon;
         private TextView name;
+        private TextView description;
 
         private ViewHolder(View view) {
             super(view);
             this.view = view;
             this.icon = (ImageView) view.findViewById(R.id.material_drawer_icon);
             this.name = (TextView) view.findViewById(R.id.material_drawer_name);
+            this.description = (TextView) view.findViewById(R.id.material_drawer_description);
         }
     }
 }

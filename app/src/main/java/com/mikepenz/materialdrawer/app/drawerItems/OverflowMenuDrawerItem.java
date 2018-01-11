@@ -7,17 +7,18 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.app.R;
-import com.mikepenz.materialdrawer.model.BasePrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.BaseDescribeableDrawerItem;
 import com.mikepenz.materialdrawer.model.BaseViewHolder;
+
+import java.util.List;
 
 /**
  * Created by mikepenz on 03.02.15.
  */
-public class OverflowMenuDrawerItem extends BasePrimaryDrawerItem<OverflowMenuDrawerItem, OverflowMenuDrawerItem.ViewHolder> {
+public class OverflowMenuDrawerItem extends BaseDescribeableDrawerItem<OverflowMenuDrawerItem, OverflowMenuDrawerItem.ViewHolder> {
     private int mMenu;
 
     public OverflowMenuDrawerItem withMenu(int menu) {
@@ -64,7 +65,9 @@ public class OverflowMenuDrawerItem extends BasePrimaryDrawerItem<OverflowMenuDr
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         Context ctx = viewHolder.itemView.getContext();
 
         //bind the basic view parts
@@ -93,14 +96,8 @@ public class OverflowMenuDrawerItem extends BasePrimaryDrawerItem<OverflowMenuDr
     }
 
     @Override
-    public ViewHolderFactory getFactory() {
-        return new ItemFactory();
-    }
-
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     public static class ViewHolder extends BaseViewHolder {

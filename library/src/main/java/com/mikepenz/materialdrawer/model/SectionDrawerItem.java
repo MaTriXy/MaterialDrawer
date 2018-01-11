@@ -8,13 +8,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.materialdrawer.R;
 import com.mikepenz.materialdrawer.holder.ColorHolder;
 import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.model.interfaces.Typefaceable;
 import com.mikepenz.materialize.util.UIUtils;
+
+import java.util.List;
 
 /**
  * Created by mikepenz on 03.02.15.
@@ -102,7 +103,9 @@ public class SectionDrawerItem extends AbstractDrawerItem<SectionDrawerItem, Sec
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         Context ctx = viewHolder.itemView.getContext();
 
         //set the identifier from the drawerItem here. It can be used to run tests
@@ -138,14 +141,8 @@ public class SectionDrawerItem extends AbstractDrawerItem<SectionDrawerItem, Sec
     }
 
     @Override
-    public ViewHolderFactory<ViewHolder> getFactory() {
-        return new ItemFactory();
-    }
-
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

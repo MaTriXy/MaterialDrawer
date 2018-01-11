@@ -12,12 +12,12 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.adapters.FooterAdapter;
-import com.mikepenz.fastadapter.adapters.HeaderAdapter;
-import com.mikepenz.fastadapter.adapters.ItemAdapter;
+import com.mikepenz.fastadapter.IItemAdapter;
+import com.mikepenz.fastadapter.expandable.ExpandableExtension;
 import com.mikepenz.materialdrawer.holder.DimenHolder;
 import com.mikepenz.materialdrawer.holder.ImageHolder;
 import com.mikepenz.materialdrawer.holder.StringHolder;
+import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.ContainerDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Badgeable;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -48,6 +48,12 @@ public class Drawer {
      * expands it. This shared preference tracks this.
      */
     protected static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
+
+    /**
+     * Per the design guidelines, you should show the drawer on launch until the user manually
+     * expands it. This shared preference tracks this.
+     */
+    protected static final String PREF_USER_OPENED_DRAWER_BY_DRAGGING = "navigation_drawer_dragged_open";
 
 
     protected final DrawerBuilder mDrawerBuilder;
@@ -179,7 +185,7 @@ public class Drawer {
      */
     public MiniDrawer getMiniDrawer() {
         if (mDrawerBuilder.mMiniDrawer == null) {
-            mDrawerBuilder.mMiniDrawer = new MiniDrawer().withDrawer(this).withAccountHeader(mDrawerBuilder.mAccountHeader).withPositionBasedStateManagement(mDrawerBuilder.mPositionBasedStateManagement);
+            mDrawerBuilder.mMiniDrawer = new MiniDrawer().withDrawer(this).withAccountHeader(mDrawerBuilder.mAccountHeader);
         }
         return mDrawerBuilder.mMiniDrawer;
     }
@@ -229,7 +235,7 @@ public class Drawer {
      *
      * @return
      */
-    public HeaderAdapter<IDrawerItem> getHeaderAdapter() {
+    public IItemAdapter<IDrawerItem, IDrawerItem> getHeaderAdapter() {
         return mDrawerBuilder.mHeaderAdapter;
     }
 
@@ -238,7 +244,7 @@ public class Drawer {
      *
      * @return
      */
-    public ItemAdapter<IDrawerItem> getItemAdapter() {
+    public IItemAdapter<IDrawerItem, IDrawerItem> getItemAdapter() {
         return mDrawerBuilder.mItemAdapter;
     }
 
@@ -247,8 +253,17 @@ public class Drawer {
      *
      * @return
      */
-    public FooterAdapter<IDrawerItem> getFooterAdapter() {
+    public IItemAdapter<IDrawerItem, IDrawerItem> getFooterAdapter() {
         return mDrawerBuilder.mFooterAdapter;
+    }
+
+    /**
+     * get the ExpandableExtension of the current drawer
+     *
+     * @return
+     */
+    public ExpandableExtension<IDrawerItem> getExpandableExtension() {
+        return mDrawerBuilder.mExpandableExtension;
     }
 
     /**
@@ -369,6 +384,18 @@ public class Drawer {
      */
     public ActionBarDrawerToggle getActionBarDrawerToggle() {
         return mDrawerBuilder.mActionBarDrawerToggle;
+    }
+
+    /**
+     * sets the gravity for this drawer.
+     *
+     * @param gravity the gravity which is defined for the drawer
+     */
+    public void setGravity(int gravity) {
+        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) getSlider().getLayoutParams();
+        params.gravity = gravity;
+        getSlider().setLayoutParams(params);
+        mDrawerBuilder.mDrawerGravity = gravity;
     }
 
     /**
@@ -554,8 +581,16 @@ public class Drawer {
         if (mDrawerBuilder.mRecyclerView != null) {
             mDrawerBuilder.mAdapter.deselect();
             mDrawerBuilder.mAdapter.select(position, false);
-            if (mDrawerBuilder.mOnDrawerItemClickListener != null && fireOnClick && position >= 0) {
-                mDrawerBuilder.mOnDrawerItemClickListener.onItemClick(null, position, mDrawerBuilder.mAdapter.getItem(position));
+            if (fireOnClick && position >= 0) {
+                IDrawerItem item = mDrawerBuilder.mAdapter.getItem(position);
+
+                if (item instanceof AbstractDrawerItem && ((AbstractDrawerItem) item).getOnDrawerItemClickListener() != null) {
+                    ((AbstractDrawerItem) item).getOnDrawerItemClickListener().onItemClick(null, position, item);
+                }
+
+                if (mDrawerBuilder.mOnDrawerItemClickListener != null) {
+                    mDrawerBuilder.mOnDrawerItemClickListener.onItemClick(null, position, item);
+                }
             }
 
             //we set the selection on a normal item in the drawer so we have to deselect the items in the StickyDrawer
@@ -950,7 +985,7 @@ public class Drawer {
             originalOnDrawerItemClickListener = getOnDrawerItemClickListener();
             originalOnDrawerItemLongClickListener = getOnDrawerItemLongClickListener();
             originalDrawerState = getAdapter().saveInstanceState(new Bundle());
-            getAdapter().collapse(false);
+            mDrawerBuilder.mExpandableExtension.collapse(false);
             originalDrawerItems = getDrawerItems();
         }
 
@@ -960,12 +995,14 @@ public class Drawer {
         setItems(drawerItems, true);
         setSelectionAtPosition(drawerSelection, false);
 
-        //hide stickyFooter and it's shadow
-        if (getStickyFooter() != null) {
-            getStickyFooter().setVisibility(View.GONE);
-        }
-        if (getStickyFooterShadow() != null) {
-            getStickyFooterShadow().setVisibility(View.GONE);
+        if (!mDrawerBuilder.mKeepStickyItemsVisible) {
+            //hide stickyFooter and it's shadow
+            if (getStickyFooter() != null) {
+                getStickyFooter().setVisibility(View.GONE);
+            }
+            if (getStickyFooterShadow() != null) {
+                getStickyFooterShadow().setVisibility(View.GONE);
+            }
         }
     }
 

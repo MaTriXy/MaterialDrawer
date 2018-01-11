@@ -10,7 +10,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.app.R;
 import com.mikepenz.materialdrawer.holder.ImageHolder;
@@ -18,6 +17,8 @@ import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialize.util.UIUtils;
+
+import java.util.List;
 
 public class AccountDividerDrawerItem extends AbstractDrawerItem<AccountDividerDrawerItem, AccountDividerDrawerItem.ViewHolder> implements IProfile<AccountDividerDrawerItem> {
     @Override
@@ -32,7 +33,9 @@ public class AccountDividerDrawerItem extends AbstractDrawerItem<AccountDividerD
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         Context ctx = viewHolder.itemView.getContext();
 
         //set the identifier from the drawerItem here. It can be used to run tests
@@ -52,10 +55,6 @@ public class AccountDividerDrawerItem extends AbstractDrawerItem<AccountDividerD
         onPostBindView(this, viewHolder.itemView);
     }
 
-    @Override
-    public ViewHolderFactory<ViewHolder> getFactory() {
-        return new ItemFactory();
-    }
 
     @Override
     public AccountDividerDrawerItem withName(String name) {
@@ -112,10 +111,9 @@ public class AccountDividerDrawerItem extends AbstractDrawerItem<AccountDividerD
         return null;
     }
 
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {

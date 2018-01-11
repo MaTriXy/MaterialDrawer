@@ -14,6 +14,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.content.res.AppCompatResources;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.utils.IdDistributor;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.holder.ColorHolder;
 import com.mikepenz.materialdrawer.holder.DimenHolder;
@@ -611,7 +611,10 @@ public class AccountHeaderBuilder {
      * @return
      */
     public AccountHeaderBuilder withProfiles(@NonNull List<IProfile> profiles) {
-        this.mProfiles = IdDistributor.checkIds(profiles);
+        if (mDrawer != null) {
+            mDrawer.mDrawerBuilder.idDistributor.checkIds(profiles);
+        }
+        this.mProfiles = profiles;
         return this;
     }
 
@@ -625,8 +628,10 @@ public class AccountHeaderBuilder {
         if (this.mProfiles == null) {
             this.mProfiles = new ArrayList<>();
         }
-
-        Collections.addAll(this.mProfiles, IdDistributor.checkIds(profiles));
+        if (mDrawer != null) {
+            mDrawer.mDrawerBuilder.idDistributor.checkIds(profiles);
+        }
+        Collections.addAll(this.mProfiles, profiles);
 
         return this;
     }
@@ -725,7 +730,7 @@ public class AccountHeaderBuilder {
     private void handleSelectionView(IProfile profile, boolean on) {
         if (on) {
             if (Build.VERSION.SDK_INT >= 21) {
-                ((FrameLayout) mAccountHeaderContainer).setForeground(UIUtils.getCompatDrawable(mAccountHeaderContainer.getContext(), mAccountHeaderTextSectionBackgroundResource));
+                ((FrameLayout) mAccountHeaderContainer).setForeground(AppCompatResources.getDrawable(mAccountHeaderContainer.getContext(), mAccountHeaderTextSectionBackgroundResource));
                 mAccountHeaderContainer.setOnClickListener(onSelectionClickListener);
                 mAccountHeaderContainer.setTag(R.id.material_drawer_profile_header, profile);
             } else {
