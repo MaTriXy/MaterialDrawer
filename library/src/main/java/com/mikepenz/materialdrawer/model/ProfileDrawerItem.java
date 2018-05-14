@@ -6,17 +6,13 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
+import android.support.annotation.*;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.R;
 import com.mikepenz.materialdrawer.holder.ColorHolder;
@@ -28,6 +24,8 @@ import com.mikepenz.materialdrawer.model.interfaces.Typefaceable;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 import com.mikepenz.materialize.util.UIUtils;
+
+import java.util.List;
 
 /**
  * Created by mikepenz on 03.02.15.
@@ -88,11 +86,27 @@ public class ProfileDrawerItem extends AbstractDrawerItem<ProfileDrawerItem, Pro
         return this;
     }
 
+    public ProfileDrawerItem withName(@StringRes int nameRes) {
+        this.name = new StringHolder(nameRes);
+        return this;
+    }
+
     public ProfileDrawerItem withEmail(String email) {
         this.email = new StringHolder(email);
         return this;
     }
 
+    public ProfileDrawerItem withEmail(@StringRes int emailRes) {
+        this.email = new StringHolder(emailRes);
+        return this;
+    }
+
+  /**
+   * Whether to show the profile name in the account switcher.
+   *
+   * @param nameShown show name in switcher
+   * @return the {@link ProfileDrawerItem}
+   */
     public ProfileDrawerItem withNameShown(boolean nameShown) {
         this.nameShown = nameShown;
         return this;
@@ -193,7 +207,9 @@ public class ProfileDrawerItem extends AbstractDrawerItem<ProfileDrawerItem, Pro
     }
 
     @Override
-    public void bindView(ViewHolder viewHolder) {
+    public void bindView(ViewHolder viewHolder, List payloads) {
+        super.bindView(viewHolder, payloads);
+
         Context ctx = viewHolder.itemView.getContext();
 
         //set the identifier from the drawerItem here. It can be used to run tests
@@ -211,7 +227,7 @@ public class ProfileDrawerItem extends AbstractDrawerItem<ProfileDrawerItem, Pro
         int color = getColor(ctx);
         int selectedTextColor = getSelectedTextColor(ctx);
 
-        UIUtils.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, true));
+        UIUtils.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, isSelectedBackgroundAnimated()));
 
         if (nameShown) {
             viewHolder.name.setVisibility(View.VISIBLE);
@@ -252,14 +268,8 @@ public class ProfileDrawerItem extends AbstractDrawerItem<ProfileDrawerItem, Pro
     }
 
     @Override
-    public ViewHolderFactory<ViewHolder> getFactory() {
-        return new ItemFactory();
-    }
-
-    public static class ItemFactory implements ViewHolderFactory<ViewHolder> {
-        public ViewHolder create(View v) {
-            return new ViewHolder(v);
-        }
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.ContainerDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Selectable;
@@ -30,13 +31,11 @@ class DrawerUtils {
      * @param fireOnClick true if we should call the listener, false if not, null to not call the listener and not close the drawer
      */
     public static void onFooterDrawerItemClick(DrawerBuilder drawer, IDrawerItem drawerItem, View v, Boolean fireOnClick) {
-        boolean checkable = !(drawerItem != null && drawerItem instanceof Selectable && !((Selectable) drawerItem).isSelectable());
+        boolean checkable = !(drawerItem != null && drawerItem instanceof Selectable && !drawerItem.isSelectable());
         if (checkable) {
             drawer.resetStickyFooterSelection();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                v.setActivated(true);
-            }
+            v.setActivated(true);
             v.setSelected(true);
 
             //remove the selection in the list
@@ -57,8 +56,15 @@ class DrawerUtils {
 
         if (fireOnClick != null) {
             boolean consumed = false;
-            if (fireOnClick && drawer.mOnDrawerItemClickListener != null) {
-                consumed = drawer.mOnDrawerItemClickListener.onItemClick(v, -1, drawerItem);
+
+            if (fireOnClick) {
+                if (drawerItem instanceof AbstractDrawerItem && ((AbstractDrawerItem) drawerItem).getOnDrawerItemClickListener() != null) {
+                    consumed = ((AbstractDrawerItem) drawerItem).getOnDrawerItemClickListener().onItemClick(v, -1, drawerItem);
+                }
+
+                if (drawer.mOnDrawerItemClickListener != null) {
+                    consumed = drawer.mOnDrawerItemClickListener.onItemClick(v, -1, drawerItem);
+                }
             }
 
             if (!consumed) {
@@ -79,7 +85,9 @@ class DrawerUtils {
         if (position > -1) {
             if (drawer.mStickyFooterView != null && drawer.mStickyFooterView instanceof LinearLayout) {
                 LinearLayout footer = (LinearLayout) drawer.mStickyFooterView;
-
+                if (drawer.mStickyFooterDivider) {
+                    position = position + 1;
+                }
                 if (footer.getChildCount() > position && position >= 0) {
                     IDrawerItem drawerItem = (IDrawerItem) footer.getChildAt(position).getTag();
                     onFooterDrawerItemClick(drawer, drawerItem, footer.getChildAt(position), fireOnClick);
@@ -95,7 +103,7 @@ class DrawerUtils {
      * @return
      */
     public static int getPositionByIdentifier(DrawerBuilder drawer, long identifier) {
-        if (identifier >= 0) {
+        if (identifier != -1) {
             for (int i = 0; i < drawer.getAdapter().getItemCount(); i++) {
                 if (drawer.getAdapter().getItem(i).getIdentifier() == identifier) {
                     return i;
@@ -114,7 +122,7 @@ class DrawerUtils {
      * @return
      */
     public static IDrawerItem getDrawerItem(List<IDrawerItem> drawerItems, long identifier) {
-        if (identifier >= 0) {
+        if (identifier != -1) {
             for (IDrawerItem drawerItem : drawerItems) {
                 if (drawerItem.getIdentifier() == identifier) {
                     return drawerItem;
@@ -149,7 +157,7 @@ class DrawerUtils {
      * @return
      */
     public static int getStickyFooterPositionByIdentifier(DrawerBuilder drawer, long identifier) {
-        if (identifier >= 0) {
+        if (identifier != -1) {
             if (drawer.mStickyFooterView != null && drawer.mStickyFooterView instanceof LinearLayout) {
                 LinearLayout footer = (LinearLayout) drawer.mStickyFooterView;
 
@@ -392,7 +400,7 @@ class DrawerUtils {
             view.setTag(drawerItem);
 
             if (drawerItem.isEnabled()) {
-                //UIUtils.setBackground(view, UIUtils.getSelectableBackground(container.getContext(), selected_color, true));
+                //UIUtils.setBackground(view, UIUtils.getSelectableBackground(container.getContext(), selected_color, drawerItem.isSelectedBackgroundAnimated()));
                 view.setOnClickListener(onClickListener);
             }
 

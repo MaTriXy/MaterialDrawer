@@ -1,14 +1,12 @@
 package com.mikepenz.materialdrawer.model;
 
 import android.content.Context;
+import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mikepenz.fastadapter.IExpandable;
-import com.mikepenz.fastadapter.utils.IdDistributor;
-import com.mikepenz.fastadapter.utils.ViewHolderFactory;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.OnPostBindViewListener;
@@ -22,7 +20,7 @@ import java.util.List;
 /**
  * Created by mikepenz on 14.07.15.
  */
-public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> implements IDrawerItem<T, VH>, Selectable<T>, Tagable<T>, IExpandable<T, IDrawerItem> {
+public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> implements IDrawerItem<T, VH>, Selectable<T>, Tagable<T> {
     // the identifier for this item
     protected long mIdentifier = -1;
 
@@ -138,6 +136,27 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
         return mSelectable;
     }
 
+    // defines if the item's background' change should be animated when it is (de)selected
+    protected boolean mSelectedBackgroundAnimated = true;
+
+    /**
+     * set if this item is selectable
+     *
+     * @param selectedBackgroundAnimated true if this item's background should fade when it is (de) selected
+     * @return
+     */
+    public T withSelectedBackgroundAnimated(boolean selectedBackgroundAnimated) {
+        this.mSelectedBackgroundAnimated = selectedBackgroundAnimated;
+        return (T) this;
+    }
+
+    /**
+     * @return if this item is selectable
+     */
+    public boolean isSelectedBackgroundAnimated() {
+        return mSelectedBackgroundAnimated;
+    }
+
     public Drawer.OnDrawerItemClickListener mOnDrawerItemClickListener = null;
 
     public Drawer.OnDrawerItemClickListener getOnDrawerItemClickListener() {
@@ -186,22 +205,47 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
         }
     }
 
+    // the parent of this item
+    private IDrawerItem mParent;
+
+    /**
+     * @return the parent of this item
+     */
+    @Override
+    public IDrawerItem getParent() {
+        return mParent;
+    }
+
+    /**
+     * the parent for this item
+     *
+     * @param parent it's parent
+     * @return this
+     */
+    @Override
+    public IDrawerItem withParent(IDrawerItem parent) {
+        this.mParent = parent;
+        return this;
+    }
+
     // the subItems to expand for this item
     protected List<IDrawerItem> mSubItems;
 
     /**
      * a list of subItems
+     * **WARNING** Make sure the subItems provided already have identifiers
      *
      * @param subItems
      * @return
      */
     public T withSubItems(List<IDrawerItem> subItems) {
-        this.mSubItems = IdDistributor.checkIds(subItems);
+        this.mSubItems = subItems;
         return (T) this;
     }
 
     /**
      * an array of subItems
+     * **WARNING** Make sure the subItems provided already have identifiers
      *
      * @param subItems
      * @return
@@ -210,7 +254,7 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
         if (mSubItems == null) {
             mSubItems = new ArrayList<>();
         }
-        Collections.addAll(mSubItems, IdDistributor.checkIds(subItems));
+        Collections.addAll(mSubItems, subItems);
         return (T) this;
     }
 
@@ -255,14 +299,6 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
     }
 
     /**
-     * the abstract method to retrieve the ViewHolder factory
-     * The ViewHolder factory implementation should look like (see the commented code above)
-     *
-     * @return
-     */
-    public abstract ViewHolderFactory<VH> getFactory();
-
-    /**
      * generates a view by the defined LayoutRes
      *
      * @param ctx
@@ -270,8 +306,8 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
      */
     @Override
     public View generateView(Context ctx) {
-        VH viewHolder = getFactory().create(LayoutInflater.from(ctx).inflate(getLayoutRes(), null, false));
-        bindView(viewHolder);
+        VH viewHolder = getViewHolder(LayoutInflater.from(ctx).inflate(getLayoutRes(), null, false));
+        bindView(viewHolder, Collections.emptyList());
         return viewHolder.itemView;
     }
 
@@ -284,22 +320,77 @@ public abstract class AbstractDrawerItem<T, VH extends RecyclerView.ViewHolder> 
      */
     @Override
     public View generateView(Context ctx, ViewGroup parent) {
-        VH viewHolder = getFactory().create(LayoutInflater.from(ctx).inflate(getLayoutRes(), parent, false));
-        bindView(viewHolder);
+        VH viewHolder = getViewHolder(LayoutInflater.from(ctx).inflate(getLayoutRes(), parent, false));
+        bindView(viewHolder, Collections.emptyList());
         return viewHolder.itemView;
+    }
+
+    @CallSuper
+    @Override
+    public void bindView(VH holder, List<Object> payloads) {
+        holder.itemView.setTag(this);
+    }
+
+    /**
+     * called when the view is unbound
+     *
+     * @param holder
+     */
+    @Override
+    public void unbindView(VH holder) {
+
+    }
+
+    /**
+     * View got attached to the window
+     *
+     * @param holder
+     */
+    @Override
+    public void attachToWindow(VH holder) {
+
+    }
+
+    /**
+     * View got detached from the window
+     *
+     * @param holder
+     */
+    @Override
+    public void detachFromWindow(VH holder) {
+
+    }
+
+    /**
+     * is called when the ViewHolder is in a transient state. return true if you want to reuse
+     * that view anyways
+     *
+     * @param holder the viewHolder for the view which failed to recycle
+     * @return true if we want to recycle anyways (false - it get's destroyed)
+     */
+    @Override
+    public boolean failedToRecycle(VH holder) {
+        return false;
     }
 
     /**
      * This method returns the ViewHolder for our item, using the provided View.
-     * By default it will try to get the ViewHolder from the ViewHolderFactory. If this one is not implemented it will go over the generic way, wasting ~5ms
      *
      * @param parent
      * @return the ViewHolder for this Item
      */
     @Override
     public VH getViewHolder(ViewGroup parent) {
-        return getFactory().create(LayoutInflater.from(parent.getContext()).inflate(getLayoutRes(), parent, false));
+        return getViewHolder(LayoutInflater.from(parent.getContext()).inflate(getLayoutRes(), parent, false));
     }
+
+    /**
+     * This method returns the ViewHolder for our item, using the provided View.
+     *
+     * @param v
+     * @return the ViewHolder for this Item
+     */
+    public abstract VH getViewHolder(View v);
 
     /**
      * If this item equals to the given identifier
