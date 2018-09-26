@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.*;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +21,16 @@ import com.mikepenz.materialdrawer.util.DrawerUIUtils;
 import com.mikepenz.materialize.util.UIUtils;
 
 import java.util.List;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.mikepenz.materialdrawer.util.DrawerUIUtils.getBooleanStyleable;
 
 /**
  * Created by mikepenz on 03.02.15.
@@ -80,7 +88,7 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
         return this;
     }
 
-    public ProfileSettingDrawerItem withName(String name) {
+    public ProfileSettingDrawerItem withName(CharSequence name) {
         this.name = new StringHolder(name);
         return this;
     }
@@ -245,13 +253,13 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
         viewHolder.itemView.setSelected(isSelected());
 
         //get the correct color for the background
-        int selectedColor = ColorHolder.color(getSelectedColor(), ctx, R.attr.material_drawer_selected, R.color.material_drawer_selected);
+        int selectedColor = getSelectedColor(ctx);
         //get the correct color for the text
         int color = ColorHolder.color(getTextColor(), ctx, R.attr.material_drawer_primary_text, R.color.material_drawer_primary_text);
         int iconColor = ColorHolder.color(getIconColor(), ctx, R.attr.material_drawer_primary_icon, R.color.material_drawer_primary_icon);
         int descriptionColor = ColorHolder.color(getDescriptionTextColor(), ctx, R.attr.material_drawer_primary_text, R.color.material_drawer_primary_text);
 
-        UIUtils.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, isSelectedBackgroundAnimated()));
+        ViewCompat.setBackground(viewHolder.view, UIUtils.getSelectableBackground(ctx, selectedColor, isSelectedBackgroundAnimated()));
 
         StringHolder.applyTo(this.getName(), viewHolder.name);
         viewHolder.name.setTextColor(color);
@@ -272,6 +280,20 @@ public class ProfileSettingDrawerItem extends AbstractDrawerItem<ProfileSettingD
 
         //call the onPostBindView method to trigger post bind view actions (like the listener to modify the item if required)
         onPostBindView(this, viewHolder.itemView);
+    }
+
+    /**
+     * helper method to decide for the correct color
+     *
+     * @param ctx
+     * @return
+     */
+    protected int getSelectedColor(Context ctx) {
+        if (getBooleanStyleable(ctx, R.styleable.MaterialDrawer_material_drawer_legacy_style, false)) {
+            return ColorHolder.color(getSelectedColor(), ctx, R.attr.material_drawer_selected_legacy, R.color.material_drawer_selected_legacy);
+        } else {
+            return ColorHolder.color(getSelectedColor(), ctx, R.attr.material_drawer_selected, R.color.material_drawer_selected);
+        }
     }
 
     @Override
