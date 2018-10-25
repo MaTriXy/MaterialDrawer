@@ -53,7 +53,7 @@ You can find some frequently asked questions and other resources in the [WIKI / 
 ## 1. Provide the gradle dependency
 
 ```gradle
-implementation "com.mikepenz:materialdrawer:6.1.0"
+implementation "com.mikepenz:materialdrawer:6.1.1"
 
 //required support lib modules
 implementation "androidx.appcompat:appcompat:${versions.androidX}"
@@ -316,6 +316,7 @@ Create your custom style and use one of the provided themes as parent. If you do
         <item name="material_drawer_selected_legacy">@color/material_drawer_selected</item> <!-- Defines the color if legacy style (Material 1, is enabled) -->
         <item name="material_drawer_selected_text">@color/material_drawer_selected_text</item>
         <item name="material_drawer_header_selection_text">@color/material_drawer_header_selection_text</item>
+	<item name="material_drawer_header_selection_subtext">@color/material_drawer_dark_header_selection_subtext</item>
         <item name="material_drawer_legacy_style">false</item> <!-- Enables legacy Material 1 style -->
     </style>
 ```
@@ -342,7 +343,8 @@ No need to create a custom theme. Just set these colors (or some of them) and yo
     <color name="material_drawer_selected">#1F2196F3</color>
     <color name="material_drawer_selected_legacy">#E8E8E8</color>
     <color name="material_drawer_selected_text">#2196F3</color>
-    <color name="material_drawer_header_selection_text">#FFF</color>
+    <color name="material_drawer_header_selection_text">#DE000000</color>
+    <color name="material_drawer_header_selection_subtext">#8A000000</color>
 
     <!-- OVERWRITE THESE COLORS FOR A DARK THEME -->
     <!-- MaterialDrawer DEFAULT DARK colors -->
@@ -357,7 +359,8 @@ No need to create a custom theme. Just set these colors (or some of them) and yo
     <color name="material_drawer_dark_selected">#1F2196F3</color>
     <color name="material_drawer_dark_selected_legacy">#202020</color>
     <color name="material_drawer_dark_selected_text">@color/material_drawer_primary</color>
-    <color name="material_drawer_dark_header_selection_text">#FFF</color>
+    <color name="material_drawer_dark_header_selection_text">#FFFFFFFF</color>
+    <color name="material_drawer_dark_header_selection_subtext">#B3FFFFFF</color>
 ```
 
 # FAQ
