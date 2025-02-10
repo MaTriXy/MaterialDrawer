@@ -1,5 +1,47 @@
 ### Upgrade Notes
 
+#### v8.0.0
+
+- Ground up refactor of the way the `MaterialDrawer` is used and integrated into the app.
+- Please consider carefully before upgrading to this version.
+- Prior to v8 the `Drawer` would automatically inject the `DrawerLayout` into the layout hierarchy, apply window flags, and take over control of the `ActionBarDrawerToggle`.
+  - This may seem convenient for easy usecases, but created big problems for more advanced implementations where taking over window insets is expected
+  - v8 will no longer do any of this, and gives back all the control to the developer, no more unexpected layout flags, changes to the layout hierarchy or anything similar.
+- The core principle behind v8 is to offer just the UI and give back all control to developers.
+- Additionally v8 eliminates dependencies on `Materialize`, `Android-Iconics`
+- v8 also now comes with better theming support and better dark mode support
+- As v8 is ground up different in the way it is set up it is recommended to re-read the README and check out the sample again
+- Basic upgrade procedure:
+  - Add `DrawerLayout` into your layout
+  - Add `MaterialDrawerSliderView` as child to the `DrawerLayout`
+  - Find the reference to the `MaterialDrawerSliderView` in your `Activity` / `Fragment`
+  - Use the `MaterialDrawerSliderView` to fill the list / do updates
+- Basic upgrade prodedure for the `AccountHeader`:
+  - Create an instance of the `AccountHeaderView`
+  - Attach to the slider via `attachToSliderView(slider)`
+- Additionally v8 is more optimized for Kotlin meaning all legacy `with(*)` methods were replaced (kept as extension functions as legacy support) with properties
+
+##### Note
+- Please report if additional upgrade notes are required
+
+
+#### v7.0.0
+
+Now library is kotlin-first.
+
+* this release contains a big amount of changes, including many breaking API changes to make its implementation easier, and make the APIs better compatible with kotlin. 
+* please note that the interface for items changed in the `FastAdapter` as such migrating to the new version will require more effort. 
+
+
+* Update `FastAdapter` to v4 and make all relevant adjustments to the provided `DrawerItem`s
+  * Check the `FastAdapter` changelog and [migration guide](https://github.com/mikepenz/FastAdapter/blob/develop/MIGRATION.md)
+* Update `Android-Iconics` to v4
+  * Ensure to update `Android-Iconics` for your project, and use the updated kotlin icon dependencies
+  * See the migration notes for `Android-Iconics` if you run into problems
+* The general interfaces and everything stayed the same, and mainly everything was migrated to kotlin
+
+If you have any issues during the migration, or any questions come up please open a github issue so we can improve the migration guide or the documentation.
+
 #### v6.1.1
 * Further adjustments for the theme to properly meet the new material 2 design guidelines.
 ```xml

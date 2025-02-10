@@ -23,7 +23,6 @@
     <string name="drawer_item_mini_drawer_desc">Always visible MiniDrawer</string>
     <string name="drawer_item_fullscreen_drawer">FullScreen Drawer</string>
     <string name="drawer_item_fullscreen_drawer_desc">Drawer in FullScreen activity</string>
-    <string name="drawer_item_custom_container_drawer">CustomContainer Drawer</string>
     <string name="drawer_item_custom_container_drawer_desc">Drawer in different view hirachy</string>
     <string name="drawer_item_menu_drawer">Menu Drawer</string>
     <string name="drawer_item_menu_drawer_desc">Drawer from menu.xml</string>
@@ -33,6 +32,8 @@
     <string name="drawer_item_collapsing_toolbar_drawer_desc">Uses a CollapsingToolbarLayout</string>
     <string name="drawer_item_crossfade_drawer_layout_drawer">CrossfadeDrawerLayout</string>
     <string name="drawer_item_crossfade_drawer_layout_drawer_desc">2-Step Drawer behavior</string>
+    <string name="drawer_item_navigation_drawer">Nav Controller Drawer</string>
+    <string name="drawer_item_navigation_drawer_desc">Drawer with a Nav Controller</string>
 
     <string name="drawer_item_menu_drawer_item">Menu Drawer Item</string>
     <string name="drawer_item_menu_drawer_item_desc">Sample menu item with overflow button</string>
